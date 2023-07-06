@@ -1,6 +1,6 @@
+import os
 import sys
- 
-# setting path
+ # setting path
 sys.path.append('../')
 
 from pipe_helpers import select, as_list, where
@@ -101,15 +101,5 @@ neutral_like_spheres = {
 cards_df = pd.DataFrame(cards)
 cards_df.replace(neutral_like_spheres, inplace=True)
 
-# check if folder exists
-import os
-
 TEMP_FILES_FOLDER = 'data'
-
-if os.path.exists(TEMP_FILES_FOLDER):
-    # delete path
-    os.rmdir(TEMP_FILES_FOLDER)
-
-# create folder
-os.mkdir(TEMP_FILES_FOLDER)
 cards_df.to_csv(f'{TEMP_FILES_FOLDER}/cards.csv', index=False)

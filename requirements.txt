@@ -4,3 +4,4 @@ typing
 pipe
 tqdm
 pandas
+psycopg2
