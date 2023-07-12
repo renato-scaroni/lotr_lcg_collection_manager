@@ -37,7 +37,6 @@ class ContextManager:
     
 
     def update_global_context(self, df_filter, filter_label):
-        print(self.filters.keys())
         if df_filter is None and filter_label in self.filters:
             self.filters[filter_label] = None
 
