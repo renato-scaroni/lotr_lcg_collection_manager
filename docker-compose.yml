@@ -1,0 +1,11 @@
+services:
+  virtual_binder:
+    build: 
+        context: ./
+        dockerfile: ./virtual_binder/Dockerfile
+    ports:
+      - "5006:5006"
+  decks:
+    build: 
+        context: ./
+        dockerfile: ./decks/Dockerfile

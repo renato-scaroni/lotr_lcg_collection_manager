@@ -23,12 +23,14 @@ cycles = {
     'Standalone Scenarios': ['The Old Forest','Fog on the Barrow-downs','The Hunt for the Dreadnaught','The Dark of Mirkwood'],
     'Starter Decks': ['Dwarves of Durin','Elves of Lórien','Defenders of Gondor','Riders of Rohan']
 }
-packs = get_packs()
-print('loading cards in packs')
-cards = {p['code']:get_cards_in_pack(p['code']) for p in tqdm(packs, desc='loading cards in pack')}
 
-cards_list = [card for card_list in cards.values() for card in card_list]
+if __name__ == '__main__':
+    packs = get_packs()
+    print('loading cards in packs')
+    cards = {p['code']:get_cards_in_pack(p['code']) for p in tqdm(packs, desc='loading cards in pack')}
+
+    cards_list = [card for card_list in cards.values() for card in card_list]
 
 
-TEMP_FILES_FOLDER = 'data'
-pd.DataFrame(cards_list).to_csv(f'{TEMP_FILES_FOLDER}/cards_rings_db_info.csv', index=False)
+    TEMP_FILES_FOLDER = '../data'
+    pd.DataFrame(cards_list).to_csv(f'{TEMP_FILES_FOLDER}/cards_rings_db_info.csv', index=False)

@@ -34,9 +34,6 @@ def load_cards_from_packs(packs):
         | select(lambda t: t | where(is_player_card) | as_list)
         | as_list
     )
-    
-packs = load_packs_to_import()
-cards_per_pack = load_cards_from_packs(packs)
 
 def build_card_entries(packs, cards_per_pack):
     pack_names = (
@@ -59,7 +56,6 @@ def build_card_entries(packs, cards_per_pack):
     )
     return list_of_cards
 
-cards = build_card_entries(packs, cards_per_pack)
 
 def fetch_card_details(soup):
     info_soup = soup.find_all('div', {'class': 'statTextBox'})
@@ -85,21 +81,27 @@ def update_card_info(card):
     card.update(info)
     return card
 
-cards = (
-    tqdm(cards, desc='getting cards details ...', position=0, leave=True)
-    | select(update_card_info)
-    | as_list
-)
+if __name__ == '__main__':
+    packs = load_packs_to_import()
+    cards_per_pack = load_cards_from_packs(packs)
 
-neutral_like_spheres = {
-    'willpower-small': 'Neutral', 
-    'attack-small': 'Neutral', 
-    'defense-small': 'Neutral', 
-    'threat-small': 'Neutral',
-}
+    cards = build_card_entries(packs, cards_per_pack)
 
-cards_df = pd.DataFrame(cards)
-cards_df.replace(neutral_like_spheres, inplace=True)
+    cards = (
+        tqdm(cards, desc='getting cards details ...', position=0, leave=True)
+        | select(update_card_info)
+        | as_list
+    )
 
-TEMP_FILES_FOLDER = 'data'
-cards_df.to_csv(f'{TEMP_FILES_FOLDER}/cards.csv', index=False)
+    neutral_like_spheres = {
+        'willpower-small': 'Neutral', 
+        'attack-small': 'Neutral', 
+        'defense-small': 'Neutral', 
+        'threat-small': 'Neutral',
+    }
+
+    cards_df = pd.DataFrame(cards)
+    cards_df.replace(neutral_like_spheres, inplace=True)
+
+    TEMP_FILES_FOLDER = '../data'
+    cards_df.to_csv(f'{TEMP_FILES_FOLDER}/cards.csv', index=False)
