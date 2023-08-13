@@ -9,8 +9,7 @@ from functools import reduce
 import sys
  
 # setting path
-sys.path.append('../data_ingestion')
-
+sys.path.append(f'{os.getcwd()}/utils')
 from pipe_helpers import as_list
 
 BASE_PATH = 'decks'
@@ -126,29 +125,29 @@ def load_all_cards_df(file_name, cards_path="data/"):
 
 def get_used_cards_in_collection(decklist, all_cards):
     cards_per_pack = all_cards[['name', 'sphere', 'type', 'pack', 'quantity']]
-    all_cards_count = all_cards.groupby(['name', 'sphere', 'type']).sum()
-    all_cards_count = all_cards_count.reset_index()
+    cards_in_collection_count = all_cards.groupby(['name', 'sphere', 'type']).sum()
+    cards_in_collection_count = cards_in_collection_count.reset_index()
+    
+    cards_in_collection = cards_per_pack\
+        .drop(columns=['quantity'])\
+        .merge(decklist, 
+            on=["name", "pack"], 
+            how="inner")
+    cards_in_collection = cards_in_collection[['name', 'sphere', 'type', 'deck_name', 'quantity']]
+    total_of_used_cards = cards_in_collection.groupby(['name', 'sphere', 'type']).sum().reset_index()
 
-    decklist = cards_per_pack\
-                .drop(columns=['quantity'])\
-                .merge(decklist, 
-                    on=["name", "pack"], 
-                    how="inner")
-    decklist = decklist[['name', 'sphere', 'type', 'deck_name', 'quantity']]
-
-    cards_in_use = decklist.groupby(['name', 'sphere', 'type']).sum().reset_index()
-    cards_in_use = cards_in_use[['name', 'sphere', 'type', 'quantity']]
-    cards_in_use = cards_in_use.merge(all_cards_count, 
+    total_of_used_cards = total_of_used_cards[['name', 'sphere', 'type', 'quantity']]
+    total_of_used_cards = total_of_used_cards.merge(cards_in_collection_count, 
                 on=['name', 'sphere', 'type'], 
                 how="inner", 
                 suffixes=['_in_decks', '_in_collection'])
-    cards_in_use = cards_in_use[['name', 'sphere', 'type', 'quantity_in_collection', 'quantity_in_decks']]
-    cards_in_use['available_cards'] = cards_in_use['quantity_in_collection'] - cards_in_use['quantity_in_decks']
-    cards_in_use = cards_in_use[cards_in_use['available_cards'] < 0]
-
-    return decklist.merge(cards_in_use[['name', 'sphere', 'type']], 
+    total_of_used_cards = total_of_used_cards[['name', 'sphere', 'type', 'quantity_in_collection', 'quantity_in_decks']]
+    total_of_used_cards['available_cards'] = total_of_used_cards['quantity_in_collection'] - total_of_used_cards['quantity_in_decks']
+    decklist = cards_in_collection.merge(total_of_used_cards[['name', 'sphere', 'type']], 
                 on=['name', 'sphere', 'type'], 
                 how="inner")
+
+    return decklist
 
 if __name__ == '__main__':
     decks = load_decks('./decks/')
