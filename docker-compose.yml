@@ -8,10 +8,12 @@ services:
   decks:
     build: 
         context: ./
-        dockerfile: ./decks/Dockerfile
+        dockerfile: ./deck_analysis/Dockerfile
   decks-dev:
+    ports:
+      - "5006:5006"
     volumes:
       - .:/app
     build: 
         context: ./
-        dockerfile: ./decks/Dockerfile.dev
+        dockerfile: ./deck_analysis/Dockerfile.dev
