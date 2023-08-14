@@ -29,4 +29,4 @@ RUN pip install -r requirements.txt
 # WORKDIR $APP_HOME
 
 # Run the web service on container startup.
-CMD panel serve deck_analysis/app.py --address 0.0.0.0 --port 5006 --allow-websocket-origin="*"
+CMD panel serve deck_analysis/app.py --address 0.0.0.0 --port 5006 --allow-websocket-origin="*" --autoreload
