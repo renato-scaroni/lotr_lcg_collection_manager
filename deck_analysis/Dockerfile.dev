@@ -7,9 +7,6 @@ FROM ubuntu
 RUN apt update
 RUN apt install python3 -y
 RUN apt install python3-pip -y
-RUN apt install vim -y
-RUN apt install --no-install-recommends\
-    texlive-latex-base texlive-latex-extra -y
 
 # Copy local code to the container image.
 ENV APP_HOME /app
@@ -19,14 +16,6 @@ WORKDIR $APP_HOME
 COPY ./requirements.txt ./
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
-
-# RUN pdflatex -output-directory=decks decks/decks.tex
-
-# Fetching data
-# WORKDIR $APP_HOME/data_ingestion
-# RUN python cards_importer.py
-# RUN python packs_importer.py
-# WORKDIR $APP_HOME
 
 # Run the web service on container startup.
 CMD panel serve deck_analysis/app.py --address 0.0.0.0 --port 5006 --allow-websocket-origin="*" --autoreload
