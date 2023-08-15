@@ -69,6 +69,8 @@ class CardsMapPage(pn.Column):
 
         self.sync_objs()
 
+        CollectionManager().add_packs_cb(lambda _: self.sync_objs())
+        
         super().__init__(
             f'# Mapeamento de cartas compartilhadas',
             r,
@@ -110,7 +112,7 @@ class CardsMapPage(pn.Column):
     
     def compute_cards_map(self, decklists):
         all_cards = CollectionManager().published_cards_per_pack
-        packs_in_collection = CollectionManager().packs_in_collection
+        packs_in_collection = CollectionManager().get_packs_selected()
         cards_in_collection = all_cards[all_cards.pack.isin(packs_in_collection)]
         
 

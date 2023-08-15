@@ -1,5 +1,6 @@
 import pandas as pd
 import panel as pn
+import decks_utils as du
 
 class SingletonMeta(type):
     """
@@ -72,7 +73,23 @@ class CollectionManager(metaclass=SingletonMeta):
             options=self.published_cards_per_pack['pack'].drop_duplicates().tolist(),
             value=self.packs_in_collection
         )
+        
+        self.packs_widget.param.watch(self.run_packs_cb, 'value')
+        
+        self.packs_cb = []
+        
+    def load_decklists(self, path):
+        decks = du.load_decks(path)
+        decklist_df = du.cards_in_decks(du.count_cards_in_deck, decks)
+        return decklist_df
 
+    def run_packs_cb(self, event):
+        for cb in self.packs_cb:
+            cb(event)       
+
+    def add_packs_cb(self, cb):
+        self.packs_cb.append(cb)
+        
     def get_packs_selected(self):
         return self.packs_widget.value
 

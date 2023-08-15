@@ -6,6 +6,7 @@ import decks_utils as du
 from itertools import combinations
 from deck_list_page import DeckListPage
 from cards_map_page import CardsMapPage
+from collection_manager import CollectionManager
 
 pn.extension('tabulator', template='fast')
 
@@ -16,13 +17,16 @@ class MainApp(pn.Column):
             accept='.zip'
         )
         self.file_input.param.watch(self.save_file, 'value')
-        
-        
-        super().__init__(
+    
+        self.load_file_section = pn.Column(
             '# Deck Analysis',
             self.file_input,
             '# Escolha um arquivo com decks para analisar',
             '(arquivo .zip com decks em formato .txt como exportado pelo RingsDB))',
+        )
+        
+        super().__init__(
+            self.load_file_section,
             self.main_area
        )
         
@@ -36,7 +40,7 @@ class MainApp(pn.Column):
         with ZipFile(f'tmp/{file_name}.zip', 'r') as zipObj:
             zipObj.extractall(f'tmp/{file_name}')
 
-        df = self.load_decklists(f'tmp/{file_name}')
+        df = CollectionManager().load_decklists(f'tmp/{file_name}')
         cards_map = CardsMapPage(df)
         self.main_area.append(cards_map)
 
@@ -44,11 +48,7 @@ class MainApp(pn.Column):
         self.main_area.append(loaded)
 
         self.file_input.loading = False
+        self.load_file_section.visible = False
 
-    def load_decklists(self, path):
-        decks = du.load_decks(path)
-        decklist_df = du.cards_in_decks(du.count_cards_in_deck, decks)
-        return decklist_df
-
-
+CollectionManager().packs_widget.servable(target='sidebar')
 MainApp().servable(target='main')
